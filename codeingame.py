@@ -15,6 +15,9 @@ class Line(object):
     def __str__(self):
         return f"y = {self.m}x + {self.q}"
 
+    def __repr__(self):
+        return f"Line({self.m}, {self.q})"
+
     def __eq__(self, other: "Line"):
         return self.m == other.m and self.q == other.q
 
@@ -57,6 +60,9 @@ class Segment(Line):
     def __str__(self):
         return f"[{self.p1}, {self.p2}]"
 
+    def __repr__(self):
+        return f"Segment({repr(self.p1)}, {repr(self.p2)})"
+
     def __eq__(self, other: "Segment") -> bool:
         return self.p1 == other.p1 and self.p2 == other.p2
 
@@ -90,6 +96,9 @@ class Point(object):
     def __init__(self, x: int, y: int):
         self.x = x
         self.y = y
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.x}, {self.y})"
 
     def __str__(self):
         return f"{int(self.x)} {int(self.y)}"
@@ -128,6 +137,12 @@ class PointId(Point):
     def __init__(self, id, x, y):
         super().__init__(x, y)
         self.id = id
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.id}, {self.x}, {self.y})"
+
+    def __eq__(self, other: "PointId"):
+        return super().__eq__(other) and self.id == other.id
 
 # === WalkerMixIn === ======================================================== #
 
@@ -169,8 +184,10 @@ class Human(PointId):
         super().__init__(id, x, y)
         self.zombies = set()
 
-    def bind_zombies(self, zombies: List["Zombie"]):
+    def __eq__(self, other: "Human"):
+        return super().__eq__(other) and self.zombies == other.zombies
 
+    def bind_zombies(self, zombies: List["Zombie"]):
         for zombie in zombies:
             if zombie.is_attakking(self) or zombie.human_target == self:
                 self.zombies.add(zombies)
@@ -185,8 +202,20 @@ class Zombie(PointId, WalkerMixIn(speed=400, range=400)):
 
     def __init__(self, id, x, y, x_next, y_next):
         super().__init__(id, x, y)
+        self.human_target = None
         self.x_next = x_next
         self.y_next = y_next
+
+    def __repr__(self):
+        return f"Zombie({self.id}, {self.x}, {self.y}, {self.x_next}, {self.y_next})"
+
+    def __eq__(self, other: "Zombie"):
+        return (
+            super().__eq__(other)
+            and self.x_next == other.x_next
+            and self.y_next == other.y_next
+            and self.human_target == other.human_target
+        )
 
     def next(self) -> Point:
         return Point(self.x_next, self.y_next)
@@ -214,6 +243,16 @@ class Field(object):
         self.ash = ash
         self.humans = humans
         self.zombies = zombies
+
+    def __repr__(self):
+        return f"Field({repr(self.ash)}, {repr(self.humans)}, {repr(self.zombies)})"
+
+    def __eq__(self, other: "Field"):
+        return (
+            self.ash == other.ash
+            and self.humans == other.humans
+            and self.zombies == other.zombies
+        )
 
 class Game(object):
     WIDTH: int = 16000

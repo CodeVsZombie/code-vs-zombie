@@ -1,4 +1,4 @@
-from codeingame import Point, Line, Segment, Ash, Human, Zombie
+from codeingame import Point, Line, PointId, Segment, Ash, Human, Zombie, Field
 
 import math
 import pytest
@@ -182,3 +182,29 @@ def test_split_segment():
 	assert ss[2] == Segment(Point(2, 0), Point(3, 0))
 	assert ss[3] == Segment(Point(3, 0), Point(4, 0))
 	assert ss[4] == Segment(Point(4, 0), Point(4.5, 0))
+
+
+def test_reprs():
+	line = Line(3, 5)
+	assert line == eval(repr(line))
+
+	segment = Segment(Point(0, 0), Point(1, 1))
+	assert segment == eval(repr(segment))
+
+	point = Point(0, 0)
+	assert point == eval(repr(point))
+
+	point_id = PointId(3, 3, 3)
+	assert point_id == eval(repr(point_id))
+
+	ash = Ash(5, 7)
+	assert ash == eval(repr(ash))
+
+	human = Human(5, 7, 9)
+	assert human == eval(repr(human))
+
+	zombie = Zombie(7, 1, 5, 2, 6)
+	assert zombie == eval(repr(zombie))
+
+	field = Field(ash, [human], [zombie])
+	assert field == eval(repr(field))
