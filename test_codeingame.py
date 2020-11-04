@@ -34,12 +34,12 @@ def test_calculate_not_parallel():
 	a = Line(1.5, 1)
 	b = Line(3.5, 1)
 
-	assert a.parallel(b) == False
+	assert not a.parallel(b)
 
 	a = Line(1.5, 1)
 	b = Line(-1.5, 1)
 
-	assert a.parallel(b) == False
+	assert not a.parallel(b)
 
 
 def test_calculate_parallel():
@@ -69,12 +69,12 @@ def test_calculate_not_perpendicular():
 	a = Line(1.5, 1)
 	b = Line(3.5, 1)
 
-	assert a.perpendicular(b) == False
+	assert not a.perpendicular(b)
 
 	a = Line(1.5, 1)
 	b = Line(1.5, 1)
 
-	assert a.perpendicular(b) == False
+	assert not a.perpendicular(b)
 
 
 def test_calculate_perpendicular():
@@ -108,9 +108,9 @@ def test_line_not_intersect_point():
 	d = Point(1.5, 1)
 	e = Point(-1.5, -1)
 
-	assert l.intersect(c) == False
-	assert l.intersect(d) == False
-	assert l.intersect(e) == False
+	assert not l.intersect(c)
+	assert not l.intersect(d)
+	assert not l.intersect(e)
 
 
 def test_line_intersect_point():
@@ -136,9 +136,9 @@ def test_segment_not_intersect_point():
 	d = Point(1.5, 1.5)
 	e = Point(-1.5, -1.5)
 
-	assert s.intersect(c) == False
-	assert s.intersect(d) == False
-	assert s.intersect(e) == False
+	assert not s.intersect(c)
+	assert not s.intersect(d)
+	assert not s.intersect(e)
 
 def test_segment_intersect_point():
 	a = Point(0, 0)
