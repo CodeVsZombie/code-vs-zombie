@@ -7,3 +7,7 @@ This code is for competition "Code Vs Zombie" on [Codingame](https://www.codinga
 ```bash
 pytest
 ```
+
+## Game Objective
+
+- [ ] Save Always max human possible even if we hate them
