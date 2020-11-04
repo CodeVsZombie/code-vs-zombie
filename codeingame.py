@@ -237,8 +237,7 @@ class Game(object):
 
 if __name__ == '__main__':
     while True:
-        Game(
-            Ash(*[int(i) for i in input().split()]),
+        Game(Ash(*[int(i) for i in input().split()]),
             [Human(*[int(j) for j in input().split()]) for _ in range(int(input()))],
             [Zombie(*[int(j) for j in input().split()]) for _ in range(int(input()))]
         ).play()
