@@ -199,7 +199,7 @@ class Human(PointId):
     def bind_zombies(self, zombies: List["Zombie"]):
         for zombie in zombies:
             if zombie.is_attakking(self) or zombie.human_target == self:
-                self.zombies.add(zombies)
+                self.zombies.add(zombie)
                 zombie.human_target = self
 
 # === Zombie === ============================================================= #
@@ -277,7 +277,7 @@ class Game(object):
 
     def play(self) -> str:
         for human in self.field.humans:
-            human.bind_zombies(self.zombies)
+            human.bind_zombies(self.field.zombies)
 
 
 
