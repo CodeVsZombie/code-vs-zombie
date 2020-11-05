@@ -66,16 +66,28 @@ class Segment(Line):
         self.m = l.m
         self.q = l.q
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"[{self.p1}, {self.p2}]"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Segment({repr(self.p1)}, {repr(self.p2)})"
 
     def __eq__(self, other: "Segment") -> bool:
         return self.p1 == other.p1 and self.p2 == other.p2
 
-    def __truediv__(self, length: int) -> List["Segment"]:
+    def __truediv__(self, parts: int) -> List["Segment"]:
+        segments: List["Segment"] = []
+        current: "Point" = self.p1
+        length = self.length() / parts
+
+        for _ in range(parts):
+            forward = current.polar(current.angle(self.p2), length)
+            segments.append(Segment(current, forward))
+            current = forward
+
+        return segments
+
+    def __floordiv__ (self, length: int) -> List["Segment"]:
         segments: List["Segment"] = []
         current: "Point" = self.p1
 
@@ -96,11 +108,14 @@ class Segment(Line):
             and min(self.p1.y, self.p2.y) <= point.y <= max(self.p1.y, self.p2.y)
         )
 
+    def length(self) -> float:
+        return self.p1.distance(self.p2)
+
 # === Point === ============================================================== #
 
 class Point(object):
-    x: int
-    y: int
+    x: float
+    y: float
 
     def __init__(self, x: int, y: int):
         self.x = x
@@ -110,9 +125,12 @@ class Point(object):
         return f"{self.__class__.__name__}({self.x}, {self.y})"
 
     def __str__(self):
-        return f"{int(self.x)} {int(self.y)}"
+        return f"{round(self.x)} {round(self.y)}"
 
     def __eq__(self, other: "Point") -> bool:
+        if not other:
+            return False
+
         return self.x == other.x and self.y == other.y
 
     def distance(self, other: "Point") -> float:
@@ -135,8 +153,8 @@ class Point(object):
 
     def polar(self, angle: float, distance: int) -> "Point":
         return Point(
-            math.ceil(self.x + (distance * math.cos(angle))),
-            math.ceil(self.y + (distance * math.sin(angle))))
+            self.x + (distance * math.cos(angle)),
+            self.y + (distance * math.sin(angle)))
 
 # === PointId === ============================================================ #
 
@@ -209,13 +227,16 @@ class Zombie(PointId, WalkerMixIn(speed=400, range=400)):
     x_next: int
     y_next: int
 
-    def __init__(self, id, x, y, x_next, y_next):
+    def __init__(self, id, x, y, x_next, y_next, human_target=None):
         super().__init__(id, x, y)
-        self.human_target = None
+        self.human_target = human_target
         self.x_next = x_next
         self.y_next = y_next
 
     def __repr__(self):
+        if self.human_target:
+            return f"Zombie({self.id}, {self.x}, {self.y}, {self.x_next}, {self.y_next}, human_target={repr(self.human_target)})"
+
         return f"Zombie({self.id}, {self.x}, {self.y}, {self.x_next}, {self.y_next})"
 
     def __eq__(self, other: "Zombie"):

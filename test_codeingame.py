@@ -140,6 +140,7 @@ def test_segment_not_intersect_point():
 	assert not s.intersect(d)
 	assert not s.intersect(e)
 
+
 def test_segment_intersect_point():
 	a = Point(0, 0)
 	b = Point(1, 1)
@@ -154,15 +155,46 @@ def test_segment_intersect_point():
 	assert s.intersect(e)
 
 
-def test_split_segment():
+def test_segment_intersect_point_on_y():
+	a = Point(0, 8999)
+	b = Point(0, 4500)
+	s = Segment(a, b)
+
+	c = Point(0, 7999)
+	d = Point(0, 6999)
+	e = Point(0, 5999)
+
+	external = Point(8250, 9999)  # this is external
+
+	assert s.intersect(c)
+	assert s.intersect(d)
+	assert s.intersect(e)
+	assert not s.intersect(external)
+
+
+def test_split_segment_equals():
 	s = Segment(
 		Point(0,0),
 		Point(5,0)
 	)
 
-	ss = s / 1
+	ss = s / 2
+
+	assert len(ss) == 2
+
+	assert ss[0] == Segment(Point(0, 0), Point(2.5, 0))
+	assert ss[1] == Segment(Point(2.5, 0), Point(5, 0))
+
+def test_split_segment_size():
+	s = Segment(
+		Point(0,0),
+		Point(5,0)
+	)
+
+	ss = s // 1
 
 	assert len(ss) == 5
+
 	assert ss[0] == Segment(Point(0, 0), Point(1, 0))
 	assert ss[1] == Segment(Point(1, 0), Point(2, 0))
 	assert ss[2] == Segment(Point(2, 0), Point(3, 0))
@@ -174,9 +206,10 @@ def test_split_segment():
 		Point(4.5,0)
 	)
 
-	ss = s / 1
+	ss = s // 1
 
 	assert len(ss) == 5
+
 	assert ss[0] == Segment(Point(0, 0), Point(1, 0))
 	assert ss[1] == Segment(Point(1, 0), Point(2, 0))
 	assert ss[2] == Segment(Point(2, 0), Point(3, 0))
@@ -204,23 +237,8 @@ def test_reprs():
 	assert human == eval(repr(human))
 
 	zombie = Zombie(7, 1, 5, 2, 6)
+	print("zombie", repr(zombie))
 	assert zombie == eval(repr(zombie))
 
 	field = Field(ash, [human], [zombie])
 	assert field == eval(repr(field))
-
-def test_segment_intersect_point_on_y():
-	a = Point(0, 8999)
-	b = Point(0, 4500)
-	s = Segment(a, b)
-
-	c = Point(0, 7999)
-	d = Point(0, 6999)
-	e = Point(0, 5999)
-
-	external = Point(8250, 9999)  # this is external
-
-	assert s.intersect(c)
-	assert s.intersect(d)
-	assert s.intersect(e)
-	assert not s.intersect(external)
