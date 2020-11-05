@@ -293,6 +293,8 @@ class Field(object):
     def predict(self, ash: Ash) -> "Field":
         pass
 
+# === Game === =============================================================== #
+
 class Game(object):
     WIDTH: int = 16000
     HEIGHT: int = 9000
@@ -305,8 +307,6 @@ class Game(object):
 
     def play(self) -> str:
         return self.field.ash
-
-
 
 # ============================================================================ #
 
