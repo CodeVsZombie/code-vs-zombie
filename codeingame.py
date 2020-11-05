@@ -226,6 +226,9 @@ class Zombie(PointId, WalkerMixIn(speed=400, range=400)):
             and self.human_target == other.human_target
         )
 
+    def __hash__(self):
+        return hash(self.id)
+
     def next(self) -> Point:
         return Point(self.x_next, self.y_next)
 
