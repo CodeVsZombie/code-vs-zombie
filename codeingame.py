@@ -227,7 +227,7 @@ class Zombie(PointId, WalkerMixIn(speed=400, range=400)):
         )
 
     def __hash__(self):
-        return hash(self.id)
+        return hash((self.id, self.x, self.y, self.x_next, self.y_next, self.human_target))
 
     def next(self) -> Point:
         return Point(self.x_next, self.y_next)
@@ -255,6 +255,7 @@ class Field(object):
         self.ash = ash
         self.humans = humans
         self.zombies = zombies
+        self.__scan()
 
     def __repr__(self):
         return f"Field({repr(self.ash)}, {repr(self.humans)}, {repr(self.zombies)})"
@@ -266,21 +267,25 @@ class Field(object):
             and self.zombies == other.zombies
         )
 
+    def __scan(self):
+        for human in self.humans:
+            human.bind_zombies(self.zombies)
+
+    def predict(self, ash: Ash) -> "Field":
+        pass
+
 class Game(object):
     WIDTH: int = 16000
     HEIGHT: int = 9000
 
     field: Field
+    # predictions: MinMax[Field]
 
     def __init__(self, ash: Ash, humans: List[Human], zombies: List[Zombie]):
         self.field = Field(ash, humans, zombies)
 
-    def humans_by_danger(self) -> List[Human]:
-        pass
-
     def play(self) -> str:
-        for human in self.field.humans:
-            human.bind_zombies(self.field.zombies)
+        return self.field.ash
 
 
 
