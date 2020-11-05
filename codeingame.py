@@ -199,7 +199,6 @@ class Ash(Point, WalkerMixIn(speed=1000, range=2000)):
     def simulate_moves(self, zombie: "Zombie") -> List[Segment]:
         return super().simulate_moves(zombie)
 
-
 # === Human === ============================================================== #
 
 class Human(PointId):
@@ -314,8 +313,7 @@ if __name__ == '__main__':
     while True:
         game = Game(Ash(*[int(i) for i in input().split()]),
             [Human(*[int(j) for j in input().split()]) for _ in range(int(input()))],
-            [Zombie(*[int(j) for j in input().split()]) for _ in range(int(input()))]
-        )
+            [Zombie(*[int(j) for j in input().split()]) for _ in range(int(input()))])
 
         print(game.play())
 
