@@ -65,6 +65,12 @@ class Line(object):
     def __eq__(self, other: "Line") -> bool:
         return self.m == other.m and self.q == other.q
 
+    def __contains__(self, point: "Point"):
+        if not isinstance(point, Point):
+            raise TypeError('can only be done with Point')
+
+        return self.intersect(point)
+
     @staticmethod
     def from_points(p1: Point, p2: Point) -> "Line":
         if p1 == p2:
@@ -142,6 +148,12 @@ class Segment(Line):
             segments.append(Segment(current, self.p2))
 
         return segments
+
+    def __contains__(self, point: "Point"):
+        if not isinstance(point, Point):
+            raise TypeError('can only be done with Point')
+
+        return self.intersect(point)
 
     def intersect(self, point: Point) -> bool:
         return (super().intersect(point)
@@ -249,12 +261,6 @@ class Zombie(PointId, WalkerMixIn(speed=400, range=400)):
     def fake_bind(self, human: Human) -> None:
         self.human_target = human
 
-    def simulate_moves(self) -> List[Segment]:
-        if self.human_target:
-            return super().simulate_moves(self.human_target)
-
-        return []
-
 # === GameField === ========================================================== #
 
 class Field(object):
@@ -285,6 +291,16 @@ class Field(object):
 
 # === Game === =============================================================== #
 
+# 1. Zombie move
+# 2. Ash Move
+# 3. Ash Kill Zombie < 2000
+# 4. Zombie eat
+
+class Prediction(object):
+    pass
+
+# === Game === =============================================================== #
+
 class Game(object):
     WIDTH: int = 16000
     HEIGHT: int = 9000
@@ -295,7 +311,14 @@ class Game(object):
     def __init__(self, ash: Ash, humans: List[Human], zombies: List[Zombie]) -> "Game":
         self.field = Field(ash, humans, zombies)
 
+    def predict(self):
+        """must return a tree with all possible prediction
+        """
+        pass
+
     def play(self) -> Point:
+        predictions = self.predict()
+
         return self.field.ash
 
 # ============================================================================ #

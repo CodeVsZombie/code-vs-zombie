@@ -242,3 +242,25 @@ def test_reprs():
 
 	field = Field(ash, [human], [zombie])
 	assert field == eval(repr(field))
+
+
+def test_in_operator_for_line():
+	line = Line.from_points(Point(0, 0),
+													Point(2, 2))
+
+	assert Point(-1, -1) in line
+	assert Point(3, 3) in line
+	assert Point(1, 1) in line
+	assert Point(0.5, 0.5) in line
+	assert Point(1, 5) not in line
+
+
+def test_in_operator_for_segment():
+	line = Segment(Point(0, 0),
+								 Point(2, 2))
+
+	assert Point(-1, -1) not in line
+	assert Point(3, 3) not in line
+	assert Point(1, 1) in line
+	assert Point(0.5, 0.5) in line
+	assert Point(1, 5) not in line
