@@ -30,7 +30,7 @@ class Line(object):
             return Line(m=math.inf, q=p1.x)
 
         return Line(m=(p1.y - p2.y) / (p1.x - p2.x),
-            q=((p1.x * p2.y) - (p2.x * p1.y)) / (p1.x - p2.x))
+                    q=((p1.x * p2.y) - (p2.x * p1.y)) / (p1.x - p2.x))
 
     def intersect(self, point: "Point") -> bool:
         if self.m == math.inf:
@@ -100,11 +100,9 @@ class Segment(Line):
         return segments
 
     def intersect(self, point: "Point"):
-        return (
-            super().intersect(point)
-            and min(self.p1.x, self.p2.x) <= point.x <= max(self.p1.x, self.p2.x)
-            and min(self.p1.y, self.p2.y) <= point.y <= max(self.p1.y, self.p2.y)
-        )
+        return (super().intersect(point)
+                and min(self.p1.x, self.p2.x) <= point.x <= max(self.p1.x, self.p2.x)
+                and min(self.p1.y, self.p2.y) <= point.y <= max(self.p1.y, self.p2.y))
 
     def length(self) -> float:
         return self.p1.distance(self.p2)
@@ -150,9 +148,8 @@ class Point(object):
         return max(others, key = lambda p: p.distance(self))
 
     def polar(self, angle: float, distance: int) -> "Point":
-        return Point(
-            self.x + (distance * math.cos(angle)),
-            self.y + (distance * math.sin(angle)))
+        return Point(self.x + (distance * math.cos(angle)),
+                     self.y + (distance * math.sin(angle)))
 
 # === PointId === ============================================================ #
 
@@ -186,9 +183,7 @@ def WalkerMixIn(speed: int, range: int):
             pass
 
         def inside(self, point: Point) -> bool:
-            return math.sqrt(
-                (self.x - point.x) ** 2 + (self.y - point.y) ** 2
-            ) < self.RANGE
+            return math.sqrt((self.x - point.x) ** 2 + (self.y - point.y) ** 2) < self.RANGE
 
     return Walker
 
@@ -237,12 +232,10 @@ class Zombie(PointId, WalkerMixIn(speed=400, range=400)):
         return f"Zombie({self.id}, {self.x}, {self.y}, {self.x_next}, {self.y_next})"
 
     def __eq__(self, other: "Zombie"):
-        return (
-            super().__eq__(other)
-            and self.x_next == other.x_next
-            and self.y_next == other.y_next
-            and self.human_target == other.human_target
-        )
+        return (super().__eq__(other)
+                and self.x_next == other.x_next
+                and self.y_next == other.y_next
+                and self.human_target == other.human_target)
 
     def __hash__(self):
         return hash((self.id, self.x, self.y, self.x_next, self.y_next, self.human_target))
@@ -279,11 +272,9 @@ class Field(object):
         return f"Field({repr(self.ash)}, {repr(self.humans)}, {repr(self.zombies)})"
 
     def __eq__(self, other: "Field"):
-        return (
-            self.ash == other.ash
-            and self.humans == other.humans
-            and self.zombies == other.zombies
-        )
+        return (self.ash == other.ash
+                and self.humans == other.humans
+                and self.zombies == other.zombies)
 
     def __scan(self):
         for human in self.humans:
@@ -312,8 +303,8 @@ class Game(object):
 if __name__ == '__main__':
     while True:
         game = Game(Ash(*[int(i) for i in input().split()]),
-            [Human(*[int(j) for j in input().split()]) for _ in range(int(input()))],
-            [Zombie(*[int(j) for j in input().split()]) for _ in range(int(input()))])
+                   [Human(*[int(j) for j in input().split()]) for _ in range(int(input()))],
+                   [Zombie(*[int(j) for j in input().split()]) for _ in range(int(input()))])
 
         print(game.play())
 
