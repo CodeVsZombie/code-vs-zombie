@@ -264,3 +264,19 @@ def test_in_operator_for_segment():
 	assert Point(1, 1) in line
 	assert Point(0.5, 0.5) in line
 	assert Point(1, 5) not in line
+
+def test_midpoint_segment():
+	a = Point(0, 0)
+	b = Point(1, 1)
+
+	assert Segment(a, b).midpoint() == Point(0.5, 0.5)
+
+	a = Point(0, 0)
+	b = Point(1, 0)
+
+	assert Segment(a, b).midpoint() == Point(0.5, 0)
+
+	a = Point(0, 1)
+	b = Point(0, 0)
+
+	assert Segment(a, b).midpoint() == Point(0, 0.5)

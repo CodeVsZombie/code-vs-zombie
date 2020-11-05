@@ -8,7 +8,7 @@ class Point(object):
     x: float
     y: float
 
-    def __init__(self, x: int, y: int) -> "Point":
+    def __init__(self, x: float, y: float) -> "Point":
         self.x = x
         self.y = y
 
@@ -162,6 +162,10 @@ class Segment(Line):
 
     def length(self) -> float:
         return self.p1.distance(self.p2)
+
+    def midpoint(self) -> Point:
+        return Point((self.p1.x + self.p2.x) / 2,
+                     (self.p1.y + self.p2.y) / 2)
 
 # === PointId === ============================================================ #
 
