@@ -208,3 +208,19 @@ def test_reprs():
 
 	field = Field(ash, [human], [zombie])
 	assert field == eval(repr(field))
+
+def test_segment_intersect_point_on_y():
+	a = Point(0, 8999)
+	b = Point(0, 4500)
+	s = Segment(a, b)
+
+	c = Point(0, 7999)
+	d = Point(0, 6999)
+	e = Point(0, 5999)
+
+	external = Point(8250, 9999)  # this is external
+
+	assert s.intersect(c)
+	assert s.intersect(d)
+	assert s.intersect(e)
+	assert not s.intersect(external)

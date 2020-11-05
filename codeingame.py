@@ -30,17 +30,26 @@ class Line(object):
             m=(p1.y - p2.y) / (p1.x - p2.x),
             q=((p1.x * p2.y) - (p2.x * p1.y)) / (p1.x - p2.x)
         ) if p1.x != p2.x else Line(
-            m=0,
-            q=p1.y
+            m=math.inf,
+            q=p1.x
         )
 
     def intersect(self, point: "Point") -> bool:
+        if self.m == math.inf:
+            return self.q == point.x
+
         return point.x * self.m - self.q == point.y
 
     def parallel(self, other: "Line") -> bool:
         return self.m == other.m
 
     def perpendicular(self, other: "Line") -> bool:
+        if self.m == math.inf:
+            return other.m == 0
+
+        if other.m == math.inf:
+            return self.m == 0
+
         return self.m == -other.m
 
 # === Segment === ============================================================ #
@@ -267,7 +276,7 @@ class Game(object):
         pass
 
     def play(self) -> str:
-        for human in self.humans:
+        for human in self.field.humans:
             human.bind_zombies(self.zombies)
 
 
@@ -276,10 +285,12 @@ class Game(object):
 
 if __name__ == '__main__':
     while True:
-        Game(Ash(*[int(i) for i in input().split()]),
+        game = Game(Ash(*[int(i) for i in input().split()]),
             [Human(*[int(j) for j in input().split()]) for _ in range(int(input()))],
             [Zombie(*[int(j) for j in input().split()]) for _ in range(int(input()))]
-        ).play()
+        )
+
+        print(game.play())
 
 # There is a technique based on vectors that solves the problem,
 # and lets you know if there is no solution, one solution or two solutions.
