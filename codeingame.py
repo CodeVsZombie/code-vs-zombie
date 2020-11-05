@@ -26,13 +26,11 @@ class Line(object):
         if p1 == p2:
             raise ValueError(f'same point {p1}')
 
-        return Line(
-            m=(p1.y - p2.y) / (p1.x - p2.x),
-            q=((p1.x * p2.y) - (p2.x * p1.y)) / (p1.x - p2.x)
-        ) if p1.x != p2.x else Line(
-            m=math.inf,
-            q=p1.x
-        )
+        if p1.x == p2.x:
+            return Line(m=math.inf, q=p1.x)
+
+        return Line(m=(p1.y - p2.y) / (p1.x - p2.x),
+            q=((p1.x * p2.y) - (p2.x * p1.y)) / (p1.x - p2.x))
 
     def intersect(self, point: "Point") -> bool:
         if self.m == math.inf:
