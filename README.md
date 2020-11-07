@@ -2,6 +2,8 @@
 
 This code is for competition "Code Vs Zombie" on [Codingame](https://www.codingame.com/ide/puzzle/code-vs-zombies)
 
+![preview](./assets/banner.jpg)
+
 ---
 
 ## Install
