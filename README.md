@@ -6,11 +6,28 @@ This code is for competition "Code Vs Zombie" on [Codingame](https://www.codinga
 
 ---
 
+## Requirments
+
+- [Python 3](https://www.python.org/)
+- [Poetry](https://github.com/python-poetry/poetry)
+
+---
+
 ## Install
 
-Install [Poetry](https://python-poetry.org/docs/#installation) in your system.
+1. Clone repository
 
-then install package dependencies
+```bash
+git clone https://github.com/CodeVsZombie/code-vs-zombie.git
+```
+
+2. Move into directory
+
+```bash
+cd code-vs-zombie
+```
+
+3. Install dependencies using `poetry` package manager
 
 ```bash
 poetry install
