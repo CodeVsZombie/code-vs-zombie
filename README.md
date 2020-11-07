@@ -2,6 +2,8 @@
 
 This code is for competition "Code Vs Zombie" on [Codingame](https://www.codingame.com/ide/puzzle/code-vs-zombies)
 
+---
+
 ## Install
 
 Install [Poetry](https://python-poetry.org/docs/#installation) in your system.
@@ -12,11 +14,15 @@ then install package dependencies
 poetry install
 ```
 
+---
+
 ## Run test
 
 ```bash
 poetry run pytest
 ```
+
+---
 
 ## Run simulation
 
@@ -26,6 +32,8 @@ poetry run simulator <simulation-name>
 
 > `simulation-name` must be the name of one file inside `simulations` without .siml extension
 
+![Simulation Example](./assets/simulation_example.png)
+
 ### Simulation File Format
 
 A 13 13
@@ -33,6 +41,8 @@ H 1 6 7
 H 2 6 7
 H 3 6 7
 Z 4 5 6
+
+---
 
 ## Game Objective
 
