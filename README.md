@@ -49,7 +49,7 @@ poetry run pytest
 poetry run simulator <simulation-name>
 ```
 
-> `simulation-name` must be the name of one file inside `simulations` without .siml extension
+> :information_source: `simulation-name` must be the name of one file inside `simulations` without .siml extension
 
 ![Simulation Example](./assets/simulation_example.png)
 
@@ -81,7 +81,7 @@ Z 0 2500 4500 2900 4500
 Z 1 15500 6500 15260 6180
 ```
 
-to create a custom simulation, create a `<simulation-name>.siml` file into `/simulations`
+> :information_source: to create a custom simulation, create a `<simulation-name>.siml` file into `/simulations`
 
 ---
 
