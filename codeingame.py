@@ -1,22 +1,29 @@
 from typing import List, Optional, Set
 
+import sys
 import math
 
 # === Point === ============================================================== #
 
 class Point(object):
-    x: float
-    y: float
+    x: int
+    y: int
 
-    def __init__(self, x: float, y: float) -> "Point":
-        self.x = x
-        self.y = y
+    def __init__(self, x: int, y: int) -> "Point":
+        if not isinstance(x, int):
+            raise ValueError(f'x must be int, got {type(x)} => {x}')
+
+        if not isinstance(y, int):
+            raise ValueError(f'y must be int, got {type(y)} => {y}')
+
+        self.x = round(x)
+        self.y = round(y)
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.x}, {self.y})"
 
     def __str__(self) -> str:
-        return f"{round(self.x)} {round(self.y)}"
+        return f"{self.x} {self.y}"
 
     def __eq__(self, other: "Point") -> bool:
         if not other:
@@ -24,11 +31,17 @@ class Point(object):
 
         return self.x == other.x and self.y == other.y
 
+    def __iter__(self):
+        return (self.x, self.y).__iter__()
+
     def distance(self, other: "Point") -> float:
         return math.sqrt((self.x - other.x) ** 2 + (self.y - other.y) ** 2)
 
     def angle(self, other: "Point") -> float:
         return math.atan2(other.y - self.y, other.x - self.x) * 180 / math.pi
+
+    def point(self):
+        return Point(self.x, self.y)
 
     def line(self, other: "Point") -> "Line":
         return Line.from_points(self, other)
@@ -43,8 +56,11 @@ class Point(object):
         return max(others, key = lambda p: p.distance(self))
 
     def polar(self, angle: float, distance: int) -> "Point":
-        return Point(self.x + (distance * math.cos(angle)),
-                     self.y + (distance * math.sin(angle)))
+        x = round(distance * math.cos(math.radians(angle)))
+        y = round(distance * math.sin(math.radians(angle)))
+
+        return Point(self.x + (x),
+                     self.y + (y))
 
 # === Line === =============================================================== #
 
@@ -84,9 +100,9 @@ class Line(object):
 
     def intersect(self, point: Point) -> bool:
         if self.m == math.inf:
-            return self.q == point.x
+            return -1 < self.q - point.x < 1
 
-        return point.x * self.m - self.q == point.y
+        return -1 < point.x * self.m + self.q - point.y < 1
 
     def parallel(self, other: "Line") -> bool:
         return self.m == other.m
@@ -155,6 +171,9 @@ class Segment(Line):
 
         return self.intersect(point)
 
+    def __iter__(self):
+        return (self.p1, self.p2).__iter__()
+
     def intersect(self, point: Point) -> bool:
         return (super().intersect(point)
                 and min(self.p1.x, self.p2.x) <= point.x <= max(self.p1.x, self.p2.x)
@@ -164,8 +183,8 @@ class Segment(Line):
         return self.p1.distance(self.p2)
 
     def midpoint(self) -> Point:
-        return Point((self.p1.x + self.p2.x) / 2,
-                     (self.p1.y + self.p2.y) / 2)
+        return Point(round((self.p1.x + self.p2.x) / 2),
+                     round((self.p1.y + self.p2.y) / 2))
 
 # === PointId === ============================================================ #
 
@@ -179,8 +198,14 @@ class PointId(Point):
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.id}, {self.x}, {self.y})"
 
+    def __str__(self) -> str:
+        return f"{self.id} {self.x} {self.y}"
+
     def __eq__(self, other: "PointId") -> bool:
         return super().__eq__(other) and self.id == other.id
+
+    def __iter__(self):
+        return (self.id, self.x, self.y).__iter__()
 
 # === WalkerMixIn === ======================================================== #
 
@@ -192,13 +217,16 @@ def WalkerMixIn(speed: int, range: int):
         def turns_to_reach(self, other: Point) -> int:
             return math.floor(self.distance(other) - self.RANGE / self.SPEED)
 
+        def move_to(self, target: Point) -> Point:
+            self.x, self.y = self.polar(self.angle(target), self.SPEED)
+
         def simulate_moves(self, target: Point) -> List[Segment]:
             return Segment(self, target) / self.SPEED
 
         def converge(self, target: Point, converge: Point) -> Point:
             pass
 
-        def inside(self, point: Point) -> bool:
+        def reach(self, point: Point) -> bool:
             return math.sqrt((self.x - point.x) ** 2 + (self.y - point.y) ** 2) < self.RANGE
 
     return Walker
@@ -206,6 +234,9 @@ def WalkerMixIn(speed: int, range: int):
 # === Ash === ================================================================ #
 
 class Ash(Point, WalkerMixIn(speed=1000, range=2000)):
+
+    def __hash__(self) -> int:
+        return hash('ash')
 
     def simulate_moves(self, zombie: "Zombie") -> List[Segment]:
         return super().simulate_moves(zombie)
@@ -219,8 +250,14 @@ class Human(PointId):
         super().__init__(id, x, y)
         self.zombies = set()
 
+    def __str__(self) -> str:
+        return f"H {self.id} {self.x} {self.y}"
+
     def __eq__(self, other: "Human") -> bool:
         return super().__eq__(other) and self.zombies == other.zombies
+
+    def __hash__(self) -> int:
+        return hash(f'HUMAN-{self.id}')
 
     def bind_zombies(self, zombies: List["Zombie"]) -> None:
         for zombie in zombies:
@@ -247,20 +284,26 @@ class Zombie(PointId, WalkerMixIn(speed=400, range=400)):
 
         return f"Zombie({self.id}, {self.x}, {self.y}, {self.x_next}, {self.y_next})"
 
+    def __str__(self) -> str:
+        return f"Z {self.id} {self.x} {self.y} {self.x_next} {self.y_next}"
+
     def __eq__(self, other: "Zombie") -> str:
         return (super().__eq__(other)
                 and self.x_next == other.x_next
                 and self.y_next == other.y_next
                 and self.human_target == other.human_target)
 
+    def __iter__(self):
+        return (self.id, self.x, self.y, self.x_next, self.y_next).__iter__()
+
     def __hash__(self) -> int:
-        return hash((self.id, self.x, self.y, self.x_next, self.y_next, self.human_target))
+        return hash(f'ZOMBIE-{self.id}')
 
     def next(self) -> Point:
         return Point(self.x_next, self.y_next)
 
     def is_attakking(self, human: Human) -> bool:
-        return Segment(self, human).intersect(self.next())
+        return self.next() in Segment(self, human)
 
     def fake_bind(self, human: Human) -> None:
         self.human_target = human
@@ -268,6 +311,9 @@ class Zombie(PointId, WalkerMixIn(speed=400, range=400)):
 # === GameField === ========================================================== #
 
 class Field(object):
+    WIDTH: int = 16000
+    HEIGHT: int = 9000
+
     ash: Ash
     humans: List[Human]
     zombies: List[Zombie]
@@ -280,6 +326,13 @@ class Field(object):
 
     def __repr__(self) -> str:
         return f"Field({repr(self.ash)}, {repr(self.humans)}, {repr(self.zombies)})"
+
+    def __str__(self) -> str:
+        return (f"A {str(self.ash)}"
+                + '\n'
+                + "\n".join([str(human) for human in self.humans])
+                + '\n'
+                + "\n".join([str(zombie) for zombie in self.zombies]))
 
     def __eq__(self, other: "Field") -> bool:
         return (self.ash == other.ash
@@ -295,10 +348,10 @@ class Field(object):
 
 # === Game === =============================================================== #
 
-# 1. Zombie move
+# 1. Zombie move closest (Human | Ash)
 # 2. Ash Move
 # 3. Ash Kill Zombie < 2000
-# 4. Zombie eat
+# 4. Zombie eat if < 400 and get the position
 
 class Prediction(object):
     pass
@@ -306,8 +359,6 @@ class Prediction(object):
 # === Game === =============================================================== #
 
 class Game(object):
-    WIDTH: int = 16000
-    HEIGHT: int = 9000
 
     field: Field
     # predictions: MinMax[Field]
@@ -315,15 +366,36 @@ class Game(object):
     def __init__(self, ash: Ash, humans: List[Human], zombies: List[Zombie]) -> "Game":
         self.field = Field(ash, humans, zombies)
 
+    def to_simulation(self):
+        print(self.field, file=sys.stderr, flush=True)
+        return "Copy ^ into .siml file"
+
     def predict(self):
         """must return a tree with all possible prediction
         """
         pass
 
     def play(self) -> Point:
-        predictions = self.predict()
+        for human in self.field.humans:
+            attaker = '[' + ', '.join(str(zombie.id) for zombie in human.zombies) + ']' if human.zombies else 'NONE'
+            print(f'{human} {attaker}', file=sys.stderr, flush=True)
 
-        return self.field.ash
+        try:
+            saving = min([human for human in self.field.humans if human.zombies], key=lambda h: h.nearest(h.zombies).distance(h))
+            print(f'saving {saving}', file=sys.stderr, flush=True)
+
+            return saving.point()
+
+        except Exception as e:
+            print(e, file=sys.stderr, flush=True)
+
+            attaking = self.field.ash.nearest(self.field.zombies).point()
+            print(f'attaking {attaking}', file=sys.stderr, flush=True)
+
+            return attaking.point()
+
+
+
 
 # ============================================================================ #
 
@@ -334,3 +406,4 @@ if __name__ == '__main__':
                    [Zombie(*[int(j) for j in input().split()]) for _ in range(int(input()))])
 
         print(game.play())
+        # print(game.to_simulation())
