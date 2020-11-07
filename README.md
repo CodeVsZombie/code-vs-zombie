@@ -61,13 +61,23 @@ poetry run simulator <simulation-name>
 
 ### Simulation File Format
 
+| Entity | Format                   |
+| ------ | ------------------------ |
+| Ash    | `A X Y`                  |
+| Human  | `H ID X Y`               |
+| Zombie | `Z ID X Y NEXT_X NEXT_Y` |
+
+example:
+
 ```text
-A 13 13
-H 1 6 7
-H 2 6 7
-H 3 6 7
-Z 4 5 6
+A 8000 4500
+H 0 3000 4500
+H 1 14000 4500
+Z 0 2500 4500 2900 4500
+Z 1 15500 6500 15260 6180
 ```
+
+to create a custom simulation, create a `<simulation-name>.siml` file into `/simulations`
 
 ---
 
