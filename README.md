@@ -24,6 +24,8 @@ poetry run pytest
 poetry run simulator <simulation-name>
 ```
 
+> `simulation-name` must be the name of one file inside `simulations` without .siml extension
+
 ### Simulation File Format
 
 A 13 13
