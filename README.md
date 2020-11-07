@@ -35,9 +35,9 @@ poetry run simulator <simulation-name>
 ![Simulation Example](./assets/simulation_example.png)
 
 > :large_blue_circle: `blue_dot` is Ash  
-> :yellow_square: `yellow_circle` is Ash attak range  
+> :yellow_square: `yellow_circle` is Ash attack range  
 > :red_circle: `red_dot` are Zombies  
-> :blue_square: `blue_circle` are Zombies attak range  
+> :blue_square: `blue_circle` are Zombies attack range  
 > :green_circle: `green_dot` are Humans
 
 ### Simulation File Format
