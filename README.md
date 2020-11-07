@@ -61,13 +61,17 @@ poetry run simulator <simulation-name>
 
 ### Simulation File Format
 
+a simulation is a file containins the initial state of the game, where each row represent an entity into the game.
+
+Entity are represented using the following syntax:
+
 | Entity | Format                   |
 | ------ | ------------------------ |
 | Ash    | `A X Y`                  |
 | Human  | `H ID X Y`               |
 | Zombie | `Z ID X Y NEXT_X NEXT_Y` |
 
-example:
+simulation example:
 
 ```text
 A 8000 4500
