@@ -10,6 +10,7 @@ Options:
 """
 
 from os import kill
+from sys import stderr
 from typing import Any, Callable, Dict, List, Tuple, Type, Union
 
 from docopt import docopt
@@ -51,6 +52,10 @@ def main(simulation: str = None, enable_graphics: bool = True):
 
 			elif entity.startswith('Z'):
 				zombies.append(Zombie(*[int(i) for i in entity.split()[1:]]))
+
+			else:
+				if entity:
+					print(f'unparsable entity: {entity}', file=sys.stderr, flush=True)
 
 	if not ash or not humans or not zombies:
 		print('missing something')
