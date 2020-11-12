@@ -4,9 +4,43 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "f1",
+      "type": "shell",
+      "command": "poetry run simulator ${input:simulation}"
+    },
+    {
       "label": "f2",
       "type": "shell",
-      "command": "pytest"
+      "command": "poetry run pytest"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "simulation",
+      "description": "Simulation name:",
+      "options": [
+        "simple",
+        "2_zombies",
+        "2_zombies_redux",
+        "scared_human",
+        "3_vs_3",
+        "combo_opportunity",
+        "rows_to_defend",
+        "rectangle",
+        "cross",
+        "unavoidable_death",
+        "columns_of_death",
+        "rescue_mission",
+        "triangle",
+        "grave_danger",
+        "grid",
+        "hoard",
+        "flanked",
+        "split_2th_reflex",
+        "swervy_pattern",
+        "devastation"
+      ],
+      "type": "pickString"
     }
   ]
 }
