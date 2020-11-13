@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="9d01ef05-87e2-48e3-bdbc-a9cd6bf5ccd2" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/banner.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/simulation_example.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/poetry.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/2_zombies.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/2_zombies_redux.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/3_vs_3.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/columns_of_death.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/combo_opportunity.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/cross.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/devastation.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/flanked.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/grave_danger.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/grid.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/hoard.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/rectangle.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/rescue_mission.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/rows_to_defend.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/rows_to_defend_redux.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/scared_human.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/simple.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/split_2th_reflex.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/swervy_pattern.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/triangle.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulations/unavoidable_death.siml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simulator/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/tasks.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/tasks.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/codeingame.py" beforeDir="false" afterPath="$PROJECT_DIR$/codeingame.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_codeingame.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_codeingame.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1kCPELKsjp9r2wkEFuIdELrWoIh" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9d01ef05-87e2-48e3-bdbc-a9cd6bf5ccd2" name="Default Changelist" comment="" />
+      <created>1605201487380</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1605201487380</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="320" y="176" key="Vcs.Push.Dialog.v2" timestamp="1605260148315">
+      <screen x="0" y="23" width="1440" height="826" />
+    </state>
+    <state x="320" y="176" key="Vcs.Push.Dialog.v2/0.23.1440.826@0.23.1440.826" timestamp="1605260148315" />
+  </component>
+</project>

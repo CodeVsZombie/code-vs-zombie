@@ -1,23 +1,29 @@
 from typing import List, Optional, Set
+
 import sys
 import math
-
 
 # === Point === ============================================================== #
 
 class Point(object):
-    x: float
-    y: float
+    x: int
+    y: int
 
     def __init__(self, x: int, y: int) -> "Point":
-        self.x = x
-        self.y = y
+        if not isinstance(x, int):
+            raise ValueError(f'x must be int, got {type(x)} => {x}')
+
+        if not isinstance(y, int):
+            raise ValueError(f'y must be int, got {type(y)} => {y}')
+
+        self.x = round(x)
+        self.y = round(y)
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.x}, {self.y})"
 
     def __str__(self) -> str:
-        return f"{round(self.x)} {round(self.y)}"
+        return f"{self.x} {self.y}"
 
     def __eq__(self, other: "Point") -> bool:
         if not other:
@@ -25,11 +31,17 @@ class Point(object):
 
         return self.x == other.x and self.y == other.y
 
+    def __iter__(self):
+        return (self.x, self.y).__iter__()
+
     def distance(self, other: "Point") -> float:
         return math.sqrt((self.x - other.x) ** 2 + (self.y - other.y) ** 2)
 
     def angle(self, other: "Point") -> float:
         return math.atan2(other.y - self.y, other.x - self.x) * 180 / math.pi
+
+    def point(self):
+        return Point(self.x, self.y)
 
     def line(self, other: "Point") -> "Line":
         return Line.from_points(self, other)
@@ -38,15 +50,17 @@ class Point(object):
         return Segment(self, other)
 
     def nearest(self, others: List["Point"]) -> "Point":
-        return min(others, key=lambda p: p.distance(self))
+        return min(others, key = lambda p: p.distance(self))
 
     def farest(self, others: List["Point"]) -> "Point":
-        return max(others, key=lambda p: p.distance(self))
+        return max(others, key = lambda p: p.distance(self))
 
     def polar(self, angle: float, distance: int) -> "Point":
-        return Point(self.x + (distance * math.cos(angle)),
-                     self.y + (distance * math.sin(angle)))
+        x = round(distance * math.cos(math.radians(angle)))
+        y = round(distance * math.sin(math.radians(angle)))
 
+        return Point(self.x + (x),
+                     self.y + (y))
 
 # === Line === =============================================================== #
 
@@ -67,6 +81,12 @@ class Line(object):
     def __eq__(self, other: "Line") -> bool:
         return self.m == other.m and self.q == other.q
 
+    def __contains__(self, point: "Point"):
+        if not isinstance(point, Point):
+            raise TypeError('can only be done with Point')
+
+        return self.intersect(point)
+
     @staticmethod
     def from_points(p1: Point, p2: Point) -> "Line":
         if p1 == p2:
@@ -80,9 +100,9 @@ class Line(object):
 
     def intersect(self, point: Point) -> bool:
         if self.m == math.inf:
-            return self.q == point.x
+            return -1 < self.q - point.x < 1
 
-        return point.x * self.m - self.q == point.y
+        return -1 < point.x * self.m + self.q - point.y < 1
 
     def parallel(self, other: "Line") -> bool:
         return self.m == other.m
@@ -132,7 +152,7 @@ class Segment(Line):
 
         return segments
 
-    def __floordiv__(self, length: int) -> List["Segment"]:
+    def __floordiv__ (self, length: int) -> List["Segment"]:
         segments: List["Segment"] = []
         current: Point = self.p1
 
@@ -146,21 +166,26 @@ class Segment(Line):
 
         return segments
 
-    """def intersect(self, point: Point) -> bool:
-        return (super().intersect(point)
-                and min(self.p1.x, self.p2.x) <= point.x <= max(self.p1.x, self.p2.x)
-                and min(self.p1.y, self.p2.y) <= point.y <= max(self.p1.y, self.p2.y))"""
+    def __contains__(self, point: "Point"):
+        if not isinstance(point, Point):
+            raise TypeError('can only be done with Point')
+
+        return self.intersect(point)
+
+    def __iter__(self):
+        return (self.p1, self.p2).__iter__()
 
     def intersect(self, point: Point) -> bool:
-        return round(self.p1.distance(point) + self.p2.distance(point), 1) == round(self.length(), 1)
+        return (super().intersect(point)
+                and min(self.p1.x, self.p2.x) <= point.x <= max(self.p1.x, self.p2.x)
+                and min(self.p1.y, self.p2.y) <= point.y <= max(self.p1.y, self.p2.y))
 
     def length(self) -> float:
         return self.p1.distance(self.p2)
 
-    def mid_point(self) -> "Position":
-        return Point((self.p1.x + self.p2.x) / 2,
-                     (self.p1.y + self.p2.y) / 2)
-
+    def midpoint(self) -> Point:
+        return Point(round((self.p1.x + self.p2.x) / 2),
+                     round((self.p1.y + self.p2.y) / 2))
 
 # === PointId === ============================================================ #
 
@@ -174,9 +199,14 @@ class PointId(Point):
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.id}, {self.x}, {self.y})"
 
+    def __str__(self) -> str:
+        return f"{self.id} {self.x} {self.y}"
+
     def __eq__(self, other: "PointId") -> bool:
         return super().__eq__(other) and self.id == other.id
 
+    def __iter__(self):
+        return (self.id, self.x, self.y).__iter__()
 
 # === WalkerMixIn === ======================================================== #
 
@@ -188,13 +218,16 @@ def WalkerMixIn(speed: int, range: int):
         def turns_to_reach(self, other: Point) -> int:
             return math.floor((self.distance(other) - self.RANGE) / self.SPEED)
 
+        def move_to(self, target: Point) -> Point:
+            self.x, self.y = self.polar(self.angle(target), self.SPEED)
+
         def simulate_moves(self, target: Point) -> List[Segment]:
             return Segment(self, target) / self.SPEED
 
         def converge(self, target: Point, converge: Point) -> Point:
             pass
 
-        def inside(self, point: Point) -> bool:
+        def reach(self, point: Point) -> bool:
             return math.sqrt((self.x - point.x) ** 2 + (self.y - point.y) ** 2) < self.RANGE
 
     return Walker
@@ -204,9 +237,11 @@ def WalkerMixIn(speed: int, range: int):
 
 class Ash(Point, WalkerMixIn(speed=1000, range=2000)):
 
+    def __hash__(self) -> int:
+        return hash('ash')
+
     def simulate_moves(self, zombie: "Zombie") -> List[Segment]:
         return super().simulate_moves(zombie)
-
 
 # === Human === ============================================================== #
 
@@ -217,25 +252,19 @@ class Human(PointId):
         super().__init__(id, x, y)
         self.zombies = []  # set()
 
+    def __str__(self) -> str:
+        return f"H {self.id} {self.x} {self.y}"
+
     def __eq__(self, other: "Human") -> bool:
         return super().__eq__(other) and self.zombies == other.zombies
 
+    def __hash__(self) -> int:
+        return hash(f'HUMAN-{self.id}')
+
     def bind_zombies(self, zombies: List["Zombie"]) -> None:
-        # print(f"ALL ZOMBIE[{zombies}]", file=sys.stderr, flush=True)
         for zombie in zombies:
-            print(f"ZOMBIE_ID[{zombie.id}] - ZOMBIE[{zombie} {zombie.x_next} {zombie.y_next}] - HUMAN[{self}] - IS_ATTAKING= {zombie.is_attakking(self)}", file=sys.stderr, flush=True)
-            if zombie.is_attakking(self):  # or zombie.human_target == self:
-                #print(f"ZOMBIE_ID[{zombie.id}] - ZOMBIE[{zombie}] - HUMAN[{self}] - IS_ATTAKING= {zombie.is_attakking(self)}", file=sys.stderr, flush=True)
-                segment = Segment(self, zombie)
-                #print(f"SEGMENT[{segment}] - LENGTH[{segment.length()}]", file=sys.stderr, flush=True)
-                # self.zombies.add(zombie)
-                self.zombies.append({"zombie": zombie,
-                                     "distance": round(segment.length(), 2),
-                                     "segment_mid_point": segment.mid_point(),
-                                     "turns": zombie.turns_to_reach(self)
-                                     }
-                )
-                #print(f"self.zombies[{self.zombies}]", file=sys.stderr, flush=True)
+            if zombie.is_attakking(self) or zombie.human_target == self:
+                self.zombies.add(zombie)
                 zombie.human_target = self
 
         #print(f"MOST_DANGEROUS[{self.most_dangerous()}]", file=sys.stderr, flush=True)
@@ -267,34 +296,36 @@ class Zombie(PointId, WalkerMixIn(speed=400, range=400)):
 
         return f"Zombie({self.id}, {self.x}, {self.y}, {self.x_next}, {self.y_next})"
 
+    def __str__(self) -> str:
+        return f"Z {self.id} {self.x} {self.y} {self.x_next} {self.y_next}"
+
     def __eq__(self, other: "Zombie") -> str:
         return (super().__eq__(other)
                 and self.x_next == other.x_next
                 and self.y_next == other.y_next
                 and self.human_target == other.human_target)
 
+    def __iter__(self):
+        return (self.id, self.x, self.y, self.x_next, self.y_next).__iter__()
+
     def __hash__(self) -> int:
-        return hash((self.id, self.x, self.y, self.x_next, self.y_next, self.human_target))
+        return hash(f'ZOMBIE-{self.id}')
 
     def next(self) -> Point:
         return Point(self.x_next, self.y_next)
 
     def is_attakking(self, human: Human) -> bool:
-        return Segment(self, human).intersect(self.next())
+        return self.next() in Segment(self, human)
 
     def fake_bind(self, human: Human) -> None:
         self.human_target = human
 
-    def simulate_moves(self) -> List[Segment]:
-        if self.human_target:
-            return super().simulate_moves(self.human_target)
-
-        return []
-
-
 # === GameField === ========================================================== #
 
 class Field(object):
+    WIDTH: int = 16000
+    HEIGHT: int = 9000
+
     ash: Ash
     humans: List[Human]
     zombies: List[Zombie]
@@ -308,6 +339,13 @@ class Field(object):
     def __repr__(self) -> str:
         return f"Field({repr(self.ash)}, {repr(self.humans)}, {repr(self.zombies)})"
 
+    def __str__(self) -> str:
+        return (f"A {str(self.ash)}"
+                + '\n'
+                + "\n".join([str(human) for human in self.humans])
+                + '\n'
+                + "\n".join([str(zombie) for zombie in self.zombies]))
+
     def __eq__(self, other: "Field") -> bool:
         return (self.ash == other.ash
                 and self.humans == other.humans
@@ -320,51 +358,55 @@ class Field(object):
     def predict(self, ash: Ash) -> "Field":
         pass
 
+# === Game === =============================================================== #
+
+# 1. Zombie move closest (Human | Ash)
+# 2. Ash Move
+# 3. Ash Kill Zombie < 2000
+# 4. Zombie eat if < 400 and get the position
+
+class Prediction(object):
+    pass
 
 # === Game === =============================================================== #
 
 class Game(object):
-    WIDTH: int = 16000
-    HEIGHT: int = 9000
 
     field: Field
-
     # predictions: MinMax[Field]
 
     def __init__(self, ash: Ash, humans: List[Human], zombies: List[Zombie]) -> "Game":
         self.field = Field(ash, humans, zombies)
 
+    def to_simulation(self):
+        print(self.field, file=sys.stderr, flush=True)
+        return "Copy ^ into .siml file"
+
+    def predict(self):
+        """must return a tree with all possible prediction
+        """
+        pass
+
     def play(self) -> Point:
+        for human in self.field.humans:
+            attaker = '[' + ', '.join(str(zombie.id) for zombie in human.zombies) + ']' if human.zombies else 'NONE'
+            print(f'{human} {attaker}', file=sys.stderr, flush=True)
 
-        most_dangerous_zombies = list(
-            filter(lambda h: h != {}, [human.most_dangerous() for human in self.field.humans])
-        )
+        try:
+            saving = min([human for human in self.field.humans if human.zombies], key=lambda h: h.nearest(h.zombies).distance(h))
+            print(f'saving {saving}', file=sys.stderr, flush=True)
 
-        print(f"ARRAY MOST_DANGEROUS_ZOMBIES {most_dangerous_zombies}", file=sys.stderr, flush=True)
-        mid_most = self.field.ash
-        killable_zombies = []
-        for most_dangerous_zombie in most_dangerous_zombies:
-            z = most_dangerous_zombie["zombie"]
-            z_h_turns = most_dangerous_zombie["turns"]  # z.turns_to_reach(z.human_target)
-            a_z_turns = self.field.ash.turns_to_reach(z)
-            print(f"Z PERICOLOSO: {most_dangerous_zombie}", file=sys.stderr, flush=True)
-            print(f"ZOMBIE HUMAN TURNS: {z_h_turns}", file=sys.stderr, flush=True)
-            print(f"ASH ZOMBIE TURNS: {a_z_turns}", file=sys.stderr, flush=True)
-            if z_h_turns - a_z_turns < -2:
-                print(f"Z.HUMAN_TARGET NON SALVABILE: {z.human_target} ", file=sys.stderr, flush=True)
-            else:
-                print(f"Z.HUMAN_TARGET SALVABILE: {z.human_target} \n", file=sys.stderr, flush=True)
-                killable_zombies.append(most_dangerous_zombie)  # .update({"turns": z_h_turns})
+            return saving.point()
 
-        print(f"killable_zombies in time: {killable_zombies} ", file=sys.stderr, flush=True)
-        if len(killable_zombies) > 0:  # most_dangerous_zombies:
-            most_dangerous_zombie = min(killable_zombies, key=lambda x: x["turns"] and x["distance"], default=[])  # most_dangerous_zombies
-            print(f"MOST_DANGEROUS_ZOMBIE {most_dangerous_zombie}", file=sys.stderr, flush=True)
-            mid_most = most_dangerous_zombie["segment_mid_point"]
-            mid_most = Point(mid_most.x + self.field.ash.RANGE - 1300, mid_most.y + self.field.ash.RANGE - 1300)
-        print(f"MID_POINT MOST_DANGEROUS_ZOMBIE {mid_most}", file=sys.stderr, flush=True)
+        except Exception as e:
+            print(e, file=sys.stderr, flush=True)
 
-        return mid_most
+            attaking = self.field.ash.nearest(self.field.zombies).point()
+            print(f'attaking {attaking}', file=sys.stderr, flush=True)
+
+            return attaking.point()
+
+
 
 
 # ============================================================================ #
@@ -372,7 +414,8 @@ class Game(object):
 if __name__ == '__main__':
     while True:
         game = Game(Ash(*[int(i) for i in input().split()]),
-                    [Human(*[int(j) for j in input().split()]) for _ in range(int(input()))],
-                    [Zombie(*[int(j) for j in input().split()]) for _ in range(int(input()))])
+                   [Human(*[int(j) for j in input().split()]) for _ in range(int(input()))],
+                   [Zombie(*[int(j) for j in input().split()]) for _ in range(int(input()))])
 
         print(game.play())
+        # print(game.to_simulation())
