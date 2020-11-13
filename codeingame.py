@@ -271,8 +271,7 @@ class Human(PointId):
                 self.zombies.append(zombie)
 
     def most_dangerous(self):
-        #print(f"QUAA: self.zombies {self.zombies}", file=sys.stderr, flush=True)
-        return min(self.zombies, key=lambda x: x["distance"]) if self.zombies else {}
+        return min(self.zombies, key=lambda zombie: zombie.distance(zombie.human_target)) if self.zombies else {}
 
 #    def is_rescuable(self):
 
@@ -412,7 +411,7 @@ class Game(object):
                 killable_zombie.human_target) and killable_zombie.distance(killable_zombie.human_target),
                                         default=[])
             segment = Segment(most_dangerous_zombie.human_target, most_dangerous_zombie)
-            mid_most = segment.mid_point()
+            mid_most = segment.midpoint()
             mid_most = Point(mid_most.x + self.field.ash.RANGE - 1300, mid_most.y + self.field.ash.RANGE - 1300)
 
         return mid_most
