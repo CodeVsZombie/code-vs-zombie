@@ -2,37 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9d01ef05-87e2-48e3-bdbc-a9cd6bf5ccd2" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/banner.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/simulation_example.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/poetry.lock" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/2_zombies.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/2_zombies_redux.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/3_vs_3.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/columns_of_death.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/combo_opportunity.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/cross.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/devastation.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/flanked.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/grave_danger.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/grid.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/hoard.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/rectangle.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/rescue_mission.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/rows_to_defend.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/rows_to_defend_redux.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/scared_human.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/simple.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/split_2th_reflex.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/swervy_pattern.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/triangle.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulations/unavoidable_death.siml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simulator/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vscode/tasks.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/tasks.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/codeingame.py" beforeDir="false" afterPath="$PROJECT_DIR$/codeingame.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_codeingame.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_codeingame.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_simone.txt" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,6 +23,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="full.screen.before.presentation.mode" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />

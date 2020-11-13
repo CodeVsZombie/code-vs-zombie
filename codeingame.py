@@ -175,10 +175,13 @@ class Segment(Line):
     def __iter__(self):
         return (self.p1, self.p2).__iter__()
 
-    def intersect(self, point: Point) -> bool:
+    """def intersect(self, point: Point) -> bool:
         return (super().intersect(point)
                 and min(self.p1.x, self.p2.x) <= point.x <= max(self.p1.x, self.p2.x)
-                and min(self.p1.y, self.p2.y) <= point.y <= max(self.p1.y, self.p2.y))
+                and min(self.p1.y, self.p2.y) <= point.y <= max(self.p1.y, self.p2.y))"""
+
+    def intersect(self, point: Point) -> bool:
+        return round(self.p1.distance(point) + self.p2.distance(point), 1) == round(self.length(), 1)
 
     def length(self) -> float:
         return self.p1.distance(self.p2)
@@ -208,8 +211,8 @@ class PointId(Point):
     def __iter__(self):
         return (self.id, self.x, self.y).__iter__()
 
-# === WalkerMixIn === ======================================================== #
 
+# === WalkerMixIn === ======================================================== #
 def WalkerMixIn(speed: int, range: int):
     class Walker(object):
         SPEED: int = speed
@@ -263,11 +266,9 @@ class Human(PointId):
 
     def bind_zombies(self, zombies: List["Zombie"]) -> None:
         for zombie in zombies:
-            if zombie.is_attakking(self) or zombie.human_target == self:
-                self.zombies.add(zombie)
+            if zombie.is_attakking(self):
                 zombie.human_target = self
-
-        #print(f"MOST_DANGEROUS[{self.most_dangerous()}]", file=sys.stderr, flush=True)
+                self.zombies.append(zombie)
 
     def most_dangerous(self):
         #print(f"QUAA: self.zombies {self.zombies}", file=sys.stderr, flush=True)
@@ -388,25 +389,33 @@ class Game(object):
         pass
 
     def play(self) -> Point:
-        for human in self.field.humans:
-            attaker = '[' + ', '.join(str(zombie.id) for zombie in human.zombies) + ']' if human.zombies else 'NONE'
-            print(f'{human} {attaker}', file=sys.stderr, flush=True)
 
-        try:
-            saving = min([human for human in self.field.humans if human.zombies], key=lambda h: h.nearest(h.zombies).distance(h))
-            print(f'saving {saving}', file=sys.stderr, flush=True)
+        most_dangerous_zombies = list(
+            filter(lambda h: h != {}, [human.most_dangerous() for human in self.field.humans])
+        )
 
-            return saving.point()
+        mid_most = self.field.ash
+        killable_zombies = []
+        for most_dangerous_zombie in most_dangerous_zombies:
+            z_h_turns = most_dangerous_zombie.turns_to_reach(
+                most_dangerous_zombie.human_target)
+            a_z_turns = self.field.ash.turns_to_reach(most_dangerous_zombie)
+            if z_h_turns - a_z_turns < -2:
+                print(f"Z.HUMAN_TARGET NON SALVABILE: {most_dangerous_zombie.human_target} ", file=sys.stderr,
+                      flush=True)
+            else:
+                print(f"Z.HUMAN_TARGET SALVABILE: {most_dangerous_zombie.human_target} \n", file=sys.stderr, flush=True)
+                killable_zombies.append(most_dangerous_zombie)
 
-        except Exception as e:
-            print(e, file=sys.stderr, flush=True)
+        if len(killable_zombies) > 0:
+            most_dangerous_zombie = min(killable_zombies, key=lambda killable_zombie: killable_zombie.turns_to_reach(
+                killable_zombie.human_target) and killable_zombie.distance(killable_zombie.human_target),
+                                        default=[])
+            segment = Segment(most_dangerous_zombie.human_target, most_dangerous_zombie)
+            mid_most = segment.mid_point()
+            mid_most = Point(mid_most.x + self.field.ash.RANGE - 1300, mid_most.y + self.field.ash.RANGE - 1300)
 
-            attaking = self.field.ash.nearest(self.field.zombies).point()
-            print(f'attaking {attaking}', file=sys.stderr, flush=True)
-
-            return attaking.point()
-
-
+        return mid_most
 
 
 # ============================================================================ #
