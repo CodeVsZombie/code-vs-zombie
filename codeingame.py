@@ -3,6 +3,63 @@ from typing import List, Optional, Set
 import sys
 import math
 
+
+class Behaviour(object):
+    def __init__(self, ash: "Ash", zombies: List["Zombie"], humans: List["Human"]):
+        self.ash = ash
+        self.zombies = zombies
+        self.humans = humans
+
+
+class ReachMostDangerousZombie(Behaviour):
+
+    def __init__(self, ash: "Ash", zombies: List["Zombie"], humans: List["Human"]):
+        super().__init__(ash, zombies, humans)
+
+    def reach_most_dangerous_zombie(self):
+        most_dangerous_zombies = list(
+            filter(lambda h: h != {}, [human.most_dangerous() for human in self.humans])
+        )
+
+        killable_zombies = [most_dangerous_zombie for most_dangerous_zombie in most_dangerous_zombies
+                            if not (most_dangerous_zombie.turns_to_reach(most_dangerous_zombie.human_target) - self.ash.turns_to_reach(most_dangerous_zombie) < -2)
+                            ]
+
+        if len(killable_zombies) > 0:
+            print(f"REACH MOST DANGEROUS ZOMBIE", file=sys.stderr, flush=True)
+            most_dangerous_zombie = min(killable_zombies,
+                                        key=lambda killable_zombie:
+                                        killable_zombie.turns_to_reach(killable_zombie.human_target) and
+                                        killable_zombie.distance(killable_zombie.human_target),
+                                        default=[])
+            segment = Segment(most_dangerous_zombie.human_target, most_dangerous_zombie)
+            mid_most = segment.midpoint()
+            mid_most = Point(mid_most.x + self.ash.RANGE - 1300, mid_most.y + self.ash.RANGE - 1300)
+        else:
+            print(f"REACH CLOSEST HUMAN", file=sys.stderr, flush=True)
+            mid_most = ReachClosestZombieBehaivour(self.ash, self.zombies, self.humans).reach_closest_zombie()  # StayWithClosestHumanBehaivour(self.ash, self.zombies, self.humans).reach_closest_human()  # self.ash
+
+        return mid_most
+
+
+class StayWithClosestHumanBehaivour(Behaviour):
+
+    def __init__(self, ash: "Ash", zombies: List["Zombie"], humans: List["Human"]):
+        super().__init__(ash, zombies, humans)
+
+    def reach_closest_human(self):
+        return min(self.humans, key=lambda human: self.ash.distance(human)).point()
+
+
+class ReachClosestZombieBehaivour(Behaviour):
+
+    def __init__(self, ash: "Ash", zombies: List["Zombie"], humans: List["Human"]):
+        super().__init__(ash, zombies, humans)
+
+    def reach_closest_zombie(self):
+        return min(self.zombies, key=lambda zombie: self.ash.distance(zombie)).point()
+
+
 # === Point === ============================================================== #
 
 class Point(object):
@@ -365,8 +422,10 @@ class Field(object):
 # 3. Ash Kill Zombie < 2000
 # 4. Zombie eat if < 400 and get the position
 
+
 class Prediction(object):
     pass
+
 
 # === Game === =============================================================== #
 
@@ -388,33 +447,7 @@ class Game(object):
         pass
 
     def play(self) -> Point:
-
-        most_dangerous_zombies = list(
-            filter(lambda h: h != {}, [human.most_dangerous() for human in self.field.humans])
-        )
-
-        mid_most = self.field.ash
-        killable_zombies = []
-        for most_dangerous_zombie in most_dangerous_zombies:
-            z_h_turns = most_dangerous_zombie.turns_to_reach(
-                most_dangerous_zombie.human_target)
-            a_z_turns = self.field.ash.turns_to_reach(most_dangerous_zombie)
-            if z_h_turns - a_z_turns < -2:
-                print(f"Z.HUMAN_TARGET NON SALVABILE: {most_dangerous_zombie.human_target} ", file=sys.stderr,
-                      flush=True)
-            else:
-                print(f"Z.HUMAN_TARGET SALVABILE: {most_dangerous_zombie.human_target} \n", file=sys.stderr, flush=True)
-                killable_zombies.append(most_dangerous_zombie)
-
-        if len(killable_zombies) > 0:
-            most_dangerous_zombie = min(killable_zombies, key=lambda killable_zombie: killable_zombie.turns_to_reach(
-                killable_zombie.human_target) and killable_zombie.distance(killable_zombie.human_target),
-                                        default=[])
-            segment = Segment(most_dangerous_zombie.human_target, most_dangerous_zombie)
-            mid_most = segment.midpoint()
-            mid_most = Point(mid_most.x + self.field.ash.RANGE - 1300, mid_most.y + self.field.ash.RANGE - 1300)
-
-        return mid_most
+        return ReachMostDangerousZombie(self.field.ash, self.field.zombies, self.field.humans).reach_most_dangerous_zombie()
 
 
 # ============================================================================ #
