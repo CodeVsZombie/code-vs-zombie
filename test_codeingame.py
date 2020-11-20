@@ -298,7 +298,7 @@ def test_nearest_coordinate():
 	pass
 
 
-@pytest.mark.skipif(False, reason='i want to skip')
+"""@pytest.mark.skipif(False, reason='i want to skip')
 def test_win_simulations():
 	from simulator import main
 
@@ -306,4 +306,4 @@ def test_win_simulations():
 
 	for simulation in simulations:
 		assert main(simulation, enable_graphics=False)
-
+"""
