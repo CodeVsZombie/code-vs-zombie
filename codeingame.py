@@ -3,6 +3,63 @@ from typing import List, Optional, Set
 import sys
 import math
 
+
+class Behaviour(object):
+    def __init__(self, ash: "Ash", zombies: List["Zombie"], humans: List["Human"]):
+        self.ash = ash
+        self.zombies = zombies
+        self.humans = humans
+
+
+class ReachMostDangerousZombie(Behaviour):
+
+    def __init__(self, ash: "Ash", zombies: List["Zombie"], humans: List["Human"]):
+        super().__init__(ash, zombies, humans)
+
+    def reach_most_dangerous_zombie(self):
+        most_dangerous_zombies = list(
+            filter(lambda h: h != {}, [human.most_dangerous() for human in self.humans])
+        )
+
+        killable_zombies = [most_dangerous_zombie for most_dangerous_zombie in most_dangerous_zombies
+                            if not (most_dangerous_zombie.turns_to_reach(most_dangerous_zombie.human_target) - self.ash.turns_to_reach(most_dangerous_zombie) < -2)
+                            ]
+
+        if len(killable_zombies) > 0:
+            print(f"REACH MOST DANGEROUS ZOMBIE", file=sys.stderr, flush=True)
+            most_dangerous_zombie = min(killable_zombies,
+                                        key=lambda killable_zombie:
+                                        killable_zombie.turns_to_reach(killable_zombie.human_target) and
+                                        killable_zombie.distance(killable_zombie.human_target),
+                                        default=[])
+            segment = Segment(most_dangerous_zombie.human_target, most_dangerous_zombie)
+            mid_most = segment.midpoint()
+            mid_most = Point(mid_most.x + self.ash.RANGE - 1300, mid_most.y + self.ash.RANGE - 1300)
+        else:
+            print(f"REACH CLOSEST HUMAN", file=sys.stderr, flush=True)
+            mid_most = ReachClosestZombieBehaivour(self.ash, self.zombies, self.humans).reach_closest_zombie()  # StayWithClosestHumanBehaivour(self.ash, self.zombies, self.humans).reach_closest_human()  # self.ash
+
+        return mid_most
+
+
+class StayWithClosestHumanBehaivour(Behaviour):
+
+    def __init__(self, ash: "Ash", zombies: List["Zombie"], humans: List["Human"]):
+        super().__init__(ash, zombies, humans)
+
+    def reach_closest_human(self):
+        return min(self.humans, key=lambda human: self.ash.distance(human)).point()
+
+
+class ReachClosestZombieBehaivour(Behaviour):
+
+    def __init__(self, ash: "Ash", zombies: List["Zombie"], humans: List["Human"]):
+        super().__init__(ash, zombies, humans)
+
+    def reach_closest_zombie(self):
+        return min(self.zombies, key=lambda zombie: self.ash.distance(zombie)).point()
+
+
 # === Point === ============================================================== #
 
 class Point(object):
@@ -116,6 +173,7 @@ class Line(object):
 
         return self.m == -other.m
 
+
 # === Segment === ============================================================ #
 
 class Segment(Line):
@@ -174,10 +232,13 @@ class Segment(Line):
     def __iter__(self):
         return (self.p1, self.p2).__iter__()
 
-    def intersect(self, point: Point) -> bool:
+    """def intersect(self, point: Point) -> bool:
         return (super().intersect(point)
                 and min(self.p1.x, self.p2.x) <= point.x <= max(self.p1.x, self.p2.x)
-                and min(self.p1.y, self.p2.y) <= point.y <= max(self.p1.y, self.p2.y))
+                and min(self.p1.y, self.p2.y) <= point.y <= max(self.p1.y, self.p2.y))"""
+
+    def intersect(self, point: Point) -> bool:
+        return round(self.p1.distance(point) + self.p2.distance(point), 1) == round(self.length(), 1)
 
     def length(self) -> float:
         return self.p1.distance(self.p2)
@@ -207,15 +268,15 @@ class PointId(Point):
     def __iter__(self):
         return (self.id, self.x, self.y).__iter__()
 
-# === WalkerMixIn === ======================================================== #
 
+# === WalkerMixIn === ======================================================== #
 def WalkerMixIn(speed: int, range: int):
     class Walker(object):
         SPEED: int = speed
         RANGE: int = range
 
         def turns_to_reach(self, other: Point) -> int:
-            return math.floor(self.distance(other) - self.RANGE / self.SPEED)
+            return math.floor((self.distance(other) - self.RANGE) / self.SPEED)
 
         def move_to(self, target: Point) -> Point:
             self.x, self.y = self.polar(self.angle(target), self.SPEED)
@@ -231,6 +292,7 @@ def WalkerMixIn(speed: int, range: int):
 
     return Walker
 
+
 # === Ash === ================================================================ #
 
 class Ash(Point, WalkerMixIn(speed=1000, range=2000)):
@@ -244,11 +306,11 @@ class Ash(Point, WalkerMixIn(speed=1000, range=2000)):
 # === Human === ============================================================== #
 
 class Human(PointId):
-    zombies: Set["Zombie"]
+    # zombies: Set["Zombie"]
 
     def __init__(self, id, x, y) -> "Human":
         super().__init__(id, x, y)
-        self.zombies = set()
+        self.zombies = []  # set()
 
     def __str__(self) -> str:
         return f"H {self.id} {self.x} {self.y}"
@@ -261,9 +323,16 @@ class Human(PointId):
 
     def bind_zombies(self, zombies: List["Zombie"]) -> None:
         for zombie in zombies:
-            if zombie.is_attakking(self) or zombie.human_target == self:
-                self.zombies.add(zombie)
+            if zombie.is_attakking(self):
                 zombie.human_target = self
+                self.zombies.append(zombie)
+
+    def most_dangerous(self):
+        return min(self.zombies, key=lambda zombie: zombie.distance(zombie.human_target)) if self.zombies else {}
+
+#    def is_rescuable(self):
+
+
 
 # === Zombie === ============================================================= #
 
@@ -353,8 +422,10 @@ class Field(object):
 # 3. Ash Kill Zombie < 2000
 # 4. Zombie eat if < 400 and get the position
 
+
 class Prediction(object):
     pass
+
 
 # === Game === =============================================================== #
 
@@ -376,25 +447,7 @@ class Game(object):
         pass
 
     def play(self) -> Point:
-        for human in self.field.humans:
-            attaker = '[' + ', '.join(str(zombie.id) for zombie in human.zombies) + ']' if human.zombies else 'NONE'
-            print(f'{human} {attaker}', file=sys.stderr, flush=True)
-
-        try:
-            saving = min([human for human in self.field.humans if human.zombies], key=lambda h: h.nearest(h.zombies).distance(h))
-            print(f'saving {saving}', file=sys.stderr, flush=True)
-
-            return saving.point()
-
-        except Exception as e:
-            print(e, file=sys.stderr, flush=True)
-
-            attaking = self.field.ash.nearest(self.field.zombies).point()
-            print(f'attaking {attaking}', file=sys.stderr, flush=True)
-
-            return attaking.point()
-
-
+        return ReachMostDangerousZombie(self.field.ash, self.field.zombies, self.field.humans).reach_most_dangerous_zombie()
 
 
 # ============================================================================ #
