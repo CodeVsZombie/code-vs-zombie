@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Python package
+name: Continuous Integration
 
 on:
   push:
@@ -21,15 +21,6 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Update poetry
-        run: |
-          poetry update
-    - name: Install dependencies
-        run: |
-          poetry install
-    - name: Install flake
-        run: |
-          poetry add -D flake8
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v1
       with:
@@ -41,4 +32,10 @@ jobs:
         key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
         restore-keys: |
           ${{ runner.os }}-poetry-
+    - name: Update poetry
+        run: |
+          poetry update
+    - name: Install dependencies
+        run: |
+          poetry install
     - run: poetry run pytest
