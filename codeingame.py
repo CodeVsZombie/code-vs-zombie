@@ -36,7 +36,7 @@ class ReachMostDangerousZombie(Behaviour):
             mid_most = segment.midpoint()
             mid_most = Point(mid_most.x + self.ash.RANGE - 1300, mid_most.y + self.ash.RANGE - 1300)
         else:
-            print(f"REACH CLOSEST HUMAN", file=sys.stderr, flush=True)
+            print(f"REACH CLOSEST ZOMBIE", file=sys.stderr, flush=True)
             mid_most = ReachClosestZombieBehaivour(self.ash, self.zombies, self.humans).reach_closest_zombie()  # StayWithClosestHumanBehaivour(self.ash, self.zombies, self.humans).reach_closest_human()  # self.ash
 
         return mid_most
