@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "code-vs-zombie"
-version = "0.0.4"
+version = "0.0.5"
 description = ""
 authors = ["Giovanni Cardamone <g.cardamone2@gmail.com>"]
 license = "MIT"
