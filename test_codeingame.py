@@ -294,6 +294,39 @@ def test_simulation_encoding_decoding():
 	f = Field(a, [h1, h2, h3], [z1, z2])
 
 
+def test_max_combo():
+	"""
+	MAPPA => 10 X 6
+	A => Ash
+	Zx => Zombie
+
+	A # # # # # # # # #
+	# # # # # # # Z1 # #
+	# # # # # # # # # #
+	# # # # # # Z3 # # #
+	# # Z2 # # # # # # #
+	# # # # # # # # # #
+
+	:return:
+	"""
+
+	a = Ash(0, 0)
+	z1 = Zombie(id=1, x=7, y=1, x_next=6, y_next=1)
+	z2 = Zombie(id=2, x=2, y=4, x_next=2, y_next=3)
+	z3 = Zombie(id=3, x=6, y=3, x_next=2, y_next=5)
+
+	zombies = [z1, z2, z3]
+	x_sum = 0
+	y_sum = 0
+	for zombie in zombies:
+		print("ZOMBIE: ", zombie)
+		x_sum += zombie.x
+		y_sum += zombie.y
+
+	print("x_SUM: ", (x_sum / len(zombies)))
+	print("y_SUM: ", (y_sum / len(zombies)))
+
+
 def test_nearest_coordinate():
 	pass
 

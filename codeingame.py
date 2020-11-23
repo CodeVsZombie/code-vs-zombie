@@ -2,29 +2,31 @@ from typing import List, Optional, Set
 
 import sys
 import math
+import abc
 
 
-class Behaviour(object):
-    def __init__(self, ash: "Ash", zombies: List["Zombie"], humans: List["Human"]):
-        self.ash = ash
-        self.zombies = zombies
-        self.humans = humans
+# === Behavior Abstract Class === =============================================================== #
+
+class Behavior(abc.ABC):
+
+    def __init__(self, game_fields):
+        self.game_fields = game_fields
+
+    @abc.abstractmethod
+    def behave(self):
+        pass
 
 
-class ReachMostDangerousZombie(Behaviour):
+# === ReachMostDangerousZombie === =============================================================== #
 
-    def __init__(self, ash: "Ash", zombies: List["Zombie"], humans: List["Human"]):
-        super().__init__(ash, zombies, humans)
+class ReachMostDangerousZombie(Behavior):
 
-    def reach_most_dangerous_zombie(self):
-        most_dangerous_zombies = list(
-            filter(lambda h: h != {}, [human.most_dangerous() for human in self.humans])
-        )
+    def behave(self):
+        most_dangerous_zombies = self.most_dangerous_zombies()
 
-        killable_zombies = [most_dangerous_zombie for most_dangerous_zombie in most_dangerous_zombies
-                            if not (most_dangerous_zombie.turns_to_reach(most_dangerous_zombie.human_target) - self.ash.turns_to_reach(most_dangerous_zombie) < -2)
-                            ]
+        killable_zombies = self.killable_zombies(most_dangerous_zombies)
 
+        mid_most = None
         if len(killable_zombies) > 0:
             print(f"REACH MOST DANGEROUS ZOMBIE", file=sys.stderr, flush=True)
             most_dangerous_zombie = min(killable_zombies,
@@ -34,30 +36,61 @@ class ReachMostDangerousZombie(Behaviour):
                                         default=[])
             segment = Segment(most_dangerous_zombie.human_target, most_dangerous_zombie)
             mid_most = segment.midpoint()
-            mid_most = Point(mid_most.x + self.ash.RANGE - 1300, mid_most.y + self.ash.RANGE - 1300)
-        else:
-            print(f"REACH CLOSEST ZOMBIE", file=sys.stderr, flush=True)
-            mid_most = ReachClosestZombieBehaivour(self.ash, self.zombies, self.humans).reach_closest_zombie()  # StayWithClosestHumanBehaivour(self.ash, self.zombies, self.humans).reach_closest_human()  # self.ash
+            mid_most = Point(mid_most.x + self.game_fields.ash.RANGE - 1300,
+                             mid_most.y + self.game_fields.ash.RANGE - 1300)
 
+            print(f"DIRETTO ALLA POSIZIONE: {mid_most}", file=sys.stderr, flush=True)
         return mid_most
 
+    def most_dangerous_zombies(self):
+        return list(filter(lambda h: h != {}, [human.most_dangerous() for human in self.game_fields.humans]))
 
-class StayWithClosestHumanBehaivour(Behaviour):
+    def killable_zombies(self, most_dangerous_zombies):
+        return list(filter(None, map(lambda most_dangerous_zombie: most_dangerous_zombie if not (
+                most_dangerous_zombie.turns_to_reach(
+                    most_dangerous_zombie.human_target) - self.game_fields.ash.turns_to_reach(
+            most_dangerous_zombie) < -2) else None, most_dangerous_zombies)))
+        # return [most_dangerous_zombie for most_dangerous_zombie in most_dangerous_zombies
+        #        if not (most_dangerous_zombie.turns_to_reach(most_dangerous_zombie.human_target) - self.game_fields.ash.turns_to_reach(most_dangerous_zombie) < -2)
+        #        ]
 
-    def __init__(self, ash: "Ash", zombies: List["Zombie"], humans: List["Human"]):
-        super().__init__(ash, zombies, humans)
 
-    def reach_closest_human(self):
-        return min(self.humans, key=lambda human: self.ash.distance(human)).point()
+# === StayWithClosestHumanBehaivor === =============================================================== #
+
+class StayWithClosestHumanBehaivor(Behavior):
+
+    def behave(self):
+        print(f"REACH CLOSEST HUMAN", file=sys.stderr, flush=True)
+        return min(self.game_fields.humans, key=lambda human: self.game_fields.ash.distance(human)).point()
 
 
-class ReachClosestZombieBehaivour(Behaviour):
+# === ReachClosestZombieBehaivor === =============================================================== #
 
-    def __init__(self, ash: "Ash", zombies: List["Zombie"], humans: List["Human"]):
-        super().__init__(ash, zombies, humans)
+class ReachClosestZombieBehaivor(Behavior):
 
-    def reach_closest_zombie(self):
-        return min(self.zombies, key=lambda zombie: self.ash.distance(zombie)).point()
+    def behave(self):
+        print(f"REACH CLOSEST ZOMBIE", file=sys.stderr, flush=True)
+        return min(self.game_fields.zombies, key=lambda zombie: self.game_fields.ash.distance(zombie)).point()
+
+
+# === MaxComboBehaivor === =============================================================== #
+
+class MaxComboBehaivor(Behavior):
+
+    def behave(self):
+        print(f"MAX COMBO BEHAVIOR", file=sys.stderr, flush=True)
+        x_sum = 0
+        y_sum = 0
+        for zombie in self.game_fields.zombies:
+            x_sum += zombie.x
+            y_sum += zombie.y
+
+        centroid_x = int(x_sum / len(self.game_fields.zombies))
+        centroid_y = int(y_sum / len(self.game_fields.zombies))
+        #print(f"x_SUM: {centroid_x}", file=sys.stderr, flush=True)
+        #print(f"y_SUM: {centroid_y}", file=sys.stderr, flush=True)
+
+        return Point(centroid_x, centroid_y)
 
 
 # === Point === ============================================================== #
@@ -107,10 +140,10 @@ class Point(object):
         return Segment(self, other)
 
     def nearest(self, others: List["Point"]) -> "Point":
-        return min(others, key = lambda p: p.distance(self))
+        return min(others, key=lambda p: p.distance(self))
 
     def farest(self, others: List["Point"]) -> "Point":
-        return max(others, key = lambda p: p.distance(self))
+        return max(others, key=lambda p: p.distance(self))
 
     def polar(self, angle: float, distance: int) -> "Point":
         x = round(distance * math.cos(math.radians(angle)))
@@ -118,6 +151,7 @@ class Point(object):
 
         return Point(self.x + (x),
                      self.y + (y))
+
 
 # === Line === =============================================================== #
 
@@ -209,7 +243,7 @@ class Segment(Line):
 
         return segments
 
-    def __floordiv__ (self, length: int) -> List["Segment"]:
+    def __floordiv__(self, length: int) -> List["Segment"]:
         segments: List["Segment"] = []
         current: Point = self.p1
 
@@ -246,6 +280,7 @@ class Segment(Line):
     def midpoint(self) -> Point:
         return Point(round((self.p1.x + self.p2.x) / 2),
                      round((self.p1.y + self.p2.y) / 2))
+
 
 # === PointId === ============================================================ #
 
@@ -303,6 +338,7 @@ class Ash(Point, WalkerMixIn(speed=1000, range=2000)):
     def simulate_moves(self, zombie: "Zombie") -> List[Segment]:
         return super().simulate_moves(zombie)
 
+
 # === Human === ============================================================== #
 
 class Human(PointId):
@@ -329,9 +365,6 @@ class Human(PointId):
 
     def most_dangerous(self):
         return min(self.zombies, key=lambda zombie: zombie.distance(zombie.human_target)) if self.zombies else {}
-
-#    def is_rescuable(self):
-
 
 
 # === Zombie === ============================================================= #
@@ -377,6 +410,7 @@ class Zombie(PointId, WalkerMixIn(speed=400, range=400)):
     def fake_bind(self, human: Human) -> None:
         self.human_target = human
 
+
 # === GameField === ========================================================== #
 
 class Field(object):
@@ -415,6 +449,7 @@ class Field(object):
     def predict(self, ash: Ash) -> "Field":
         pass
 
+
 # === Game === =============================================================== #
 
 # 1. Zombie move closest (Human | Ash)
@@ -430,8 +465,8 @@ class Prediction(object):
 # === Game === =============================================================== #
 
 class Game(object):
-
     field: Field
+
     # predictions: MinMax[Field]
 
     def __init__(self, ash: Ash, humans: List[Human], zombies: List[Zombie]) -> "Game":
@@ -447,7 +482,8 @@ class Game(object):
         pass
 
     def play(self) -> Point:
-        return ReachMostDangerousZombie(self.field.ash, self.field.zombies, self.field.humans).reach_most_dangerous_zombie()
+        return ReachMostDangerousZombie(self.field).behave() or MaxComboBehaivor(
+            self.field).behave()  # ReachClosestZombieBehaivor(self.field).behave()
 
 
 # ============================================================================ #
@@ -455,8 +491,8 @@ class Game(object):
 if __name__ == '__main__':
     while True:
         game = Game(Ash(*[int(i) for i in input().split()]),
-                   [Human(*[int(j) for j in input().split()]) for _ in range(int(input()))],
-                   [Zombie(*[int(j) for j in input().split()]) for _ in range(int(input()))])
+                    [Human(*[int(j) for j in input().split()]) for _ in range(int(input()))],
+                    [Zombie(*[int(j) for j in input().split()]) for _ in range(int(input()))])
 
         print(game.play())
         # print(game.to_simulation())
